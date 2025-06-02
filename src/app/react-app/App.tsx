@@ -4,7 +4,7 @@ import { materialRenderers, materialCells } from '@jsonforms/material-renderers'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
-interface AppProps {}
+interface AppProps { }
 
 const schema = {
   type: 'object',
@@ -14,10 +14,11 @@ const schema = {
       title: 'Name',
       description: 'Enter your full name'
     },
-    age: {
-      type: 'number',
-      title: 'Age',
-      description: 'Enter your age'
+    dateOfBirth: {
+      type: 'string',
+      format: 'date',
+      title: 'Date of Birth',
+      description: 'Select your date of birth'
     },
     occupation: {
       type: 'string',
@@ -26,26 +27,9 @@ const schema = {
       enum: ['Developer', 'Designer', 'Manager', 'Other']
     }
   },
-  required: ['name', 'age']
+  required: ['name', 'dateOfBirth']
 };
 
-const uischema = {
-  type: 'VerticalLayout',
-  elements: [
-    {
-      type: 'Control',
-      scope: '#/properties/name'
-    },
-    {
-      type: 'Control',
-      scope: '#/properties/age'
-    },
-    {
-      type: 'Control',
-      scope: '#/properties/occupation'
-    }
-  ]
-};
 
 export const App: React.FC<AppProps> = () => {
   const [data, setData] = useState({});
@@ -64,7 +48,6 @@ export const App: React.FC<AppProps> = () => {
         <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
           <JsonForms
             schema={schema}
-            uischema={uischema}
             data={data}
             renderers={materialRenderers}
             cells={materialCells}
