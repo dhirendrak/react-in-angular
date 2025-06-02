@@ -25,6 +25,12 @@ const schema = {
       title: 'Occupation',
       description: 'Select your occupation',
       enum: ['Developer', 'Designer', 'Manager', 'Other']
+    },
+    description: {
+      type: 'string',
+      title: 'Description',
+      description: 'Enter a detailed description',
+      format: 'html'
     }
   },
   required: ['name', 'dateOfBirth']
