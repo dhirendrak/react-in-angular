@@ -3,6 +3,9 @@ import { JsonForms } from '@jsonforms/react';
 import { materialRenderers, materialCells } from '@jsonforms/material-renderers';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import { JsonSchema, UISchemaElement } from '@jsonforms/core';
 
 interface AppProps { }
 
@@ -36,6 +39,36 @@ const schema = {
   required: ['name', 'dateOfBirth']
 };
 
+interface TiptapEditorProps {
+  data: string;
+  onChange: (value: string) => void;
+}
+
+const TiptapEditor: React.FC<TiptapEditorProps> = ({ data, onChange }) => {
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: data,
+    onUpdate: ({ editor }) => {
+      onChange(editor.getHTML());
+    },
+  });
+
+  return (
+    <div style={{ border: '1px solid #ccc', borderRadius: '4px', padding: '8px' }}>
+      <EditorContent editor={editor} />
+    </div>
+  );
+};
+
+const customRenderers = [
+  ...materialRenderers,
+  {
+    tester: (uischema: UISchemaElement, schema: JsonSchema) => {
+      return schema?.format === 'html' ? 10 : -1;
+    },
+    renderer: TiptapEditor
+  }
+];
 
 export const App: React.FC<AppProps> = () => {
   const [data, setData] = useState({});
@@ -55,7 +88,7 @@ export const App: React.FC<AppProps> = () => {
           <JsonForms
             schema={schema}
             data={data}
-            renderers={materialRenderers}
+            renderers={customRenderers}
             cells={materialCells}
             onChange={({ data }) => setData(data)}
           />
