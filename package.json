@@ -17,6 +17,12 @@
     "@angular/platform-browser": "^17.0.0",
     "@angular/platform-browser-dynamic": "^17.0.0",
     "@angular/router": "^17.0.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@jsonforms/core": "^3.5.1",
+    "@jsonforms/material-renderers": "^3.5.1",
+    "@jsonforms/react": "^3.5.1",
+    "@mui/material": "^6.4.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rxjs": "~7.8.0",
@@ -31,4 +37,4 @@
     "@types/react-dom": "^18.2.0",
     "typescript": "~5.2.2"
   }
-} 
+}
