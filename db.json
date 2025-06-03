@@ -29,6 +29,14 @@
         "title": "Description",
         "description": "Enter a detailed description",
         "format": "html"
+      },
+      "objectives": {
+        "type": "array",
+        "title": "Objectives",
+        "description": "Enter your objectives",
+        "items": {
+          "type": "string"
+        }
       }
     },
     "required": [
@@ -40,6 +48,19 @@
     {
       "id": "8dc9",
       "description": "The Description is updated"
+    },
+    {
+      "id": "d2bc",
+      "objectives": [
+        "First objective ",
+        "2nn objective"
+      ]
+    },
+    {
+      "id": "c992",
+      "objectives": [
+        "new objective "
+      ]
     }
   ]
 }

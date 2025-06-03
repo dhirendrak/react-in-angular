@@ -5,10 +5,11 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { JsonSchema, UISchemaElement } from '@jsonforms/core';
+import { JsonSchema, UISchemaElement, rankWith } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import { ControlProps } from '@jsonforms/core';
 import { Button, Stack, Snackbar, Alert } from '@mui/material';
+import ObjectivesArrayControl from './components/ObjectivesArrayControl';
 
 interface AppProps { }
 
@@ -73,6 +74,13 @@ const TiptapEditorControl = withJsonFormsControlProps(TiptapEditor);
 
 const customRenderers = [
   ...materialRenderers,
+  {
+    tester: rankWith(20, (schema) => {
+      const s = schema as any;
+      return s?.type === 'array' && s?.title === 'Objectives';
+    }),
+    renderer: ObjectivesArrayControl
+  },
   {
     tester: (schema: JsonSchema) => {
       return schema?.format === 'html' ? 10 : -1;
