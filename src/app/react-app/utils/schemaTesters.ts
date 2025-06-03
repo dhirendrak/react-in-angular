@@ -1,5 +1,9 @@
-import { JsonSchema } from '@jsonforms/core';
+import { and, isStringControl, JsonSchema, rankWith, schemaMatches } from '@jsonforms/core';
 
-export const htmlFormatTester = (schema: JsonSchema) => {
-  return schema?.format === 'html' ? 10 : -1;
-}; 
+export default rankWith(
+  20,
+  and(
+    isStringControl,
+    schemaMatches((schema: JsonSchema) => schema.format === 'html')
+  )
+);

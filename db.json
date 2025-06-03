@@ -28,14 +28,15 @@
         "type": "string",
         "title": "Description",
         "description": "Enter a detailed description",
-        "format": "string"
+        "format": "html"
       },
       "objectives": {
         "type": "array",
         "title": "Objectives",
         "description": "Enter your objectives",
         "items": {
-          "type": "string"
+          "type": "string",
+          "format": "html"
         }
       }
     },
