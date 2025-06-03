@@ -28,7 +28,7 @@
         "type": "string",
         "title": "Description",
         "description": "Enter a detailed description",
-        "format": "html"
+        "format": "string"
       },
       "objectives": {
         "type": "array",
