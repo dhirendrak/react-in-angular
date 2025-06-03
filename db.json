@@ -44,23 +44,15 @@
       "dateOfBirth"
     ]
   },
-  "forms": [
-    {
-      "id": "8dc9",
-      "description": "The Description is updated"
-    },
-    {
-      "id": "d2bc",
-      "objectives": [
-        "First objective ",
-        "2nn objective"
-      ]
-    },
-    {
-      "id": "c992",
-      "objectives": [
-        "new objective "
-      ]
-    }
-  ]
+  "form": {
+    "id": "1",
+    "name": "",
+    "dateOfBirth": "",
+    "occupation": "",
+    "description": "new description ",
+    "objectives": [
+      "new objective",
+      "1 more objective"
+    ]
+  }
 }

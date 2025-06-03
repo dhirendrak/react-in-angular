@@ -9,7 +9,6 @@ import { JsonSchema, UISchemaElement, rankWith } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import { ControlProps } from '@jsonforms/core';
 import { Button, Stack, Snackbar, Alert } from '@mui/material';
-import ObjectivesArrayControl from './components/ObjectivesArrayControl';
 
 interface AppProps { }
 
@@ -75,13 +74,6 @@ const TiptapEditorControl = withJsonFormsControlProps(TiptapEditor);
 const customRenderers = [
   ...materialRenderers,
   {
-    tester: rankWith(20, (schema) => {
-      const s = schema as any;
-      return s?.type === 'array' && s?.title === 'Objectives';
-    }),
-    renderer: ObjectivesArrayControl
-  },
-  {
     tester: (schema: JsonSchema) => {
       return schema?.format === 'html' ? 10 : -1;
     },
@@ -95,15 +87,20 @@ export const App: React.FC<AppProps> = () => {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
   useEffect(() => {
-    // Fetch schema from JSON Server
-    fetch('http://localhost:3001/schema')
-      .then(response => response.json())
-      .then(schemaData => setSchema(schemaData))
+    // Fetch schema and form data from JSON Server
+    Promise.all([
+      fetch('http://localhost:3001/schema').then(response => response.json()),
+      fetch('http://localhost:3001/form').then(response => response.json())
+    ])
+      .then(([schemaData, formData]) => {
+        setSchema(schemaData);
+        setData(formData);
+      })
       .catch(error => {
-        console.error('Error fetching schema:', error);
+        console.error('Error fetching data:', error);
         setSnackbar({
           open: true,
-          message: 'Error loading form schema',
+          message: 'Error loading form data',
           severity: 'error'
         });
       });
@@ -111,8 +108,8 @@ export const App: React.FC<AppProps> = () => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch('http://localhost:3001/forms', {
-        method: 'POST',
+      const response = await fetch('http://localhost:3001/form', {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -122,17 +119,17 @@ export const App: React.FC<AppProps> = () => {
       if (response.ok) {
         setSnackbar({
           open: true,
-          message: 'Form data saved successfully!',
+          message: 'Form data updated successfully!',
           severity: 'success'
         });
       } else {
-        throw new Error('Failed to save data');
+        throw new Error('Failed to update data');
       }
     } catch (error) {
-      console.error('Error saving data:', error);
+      console.error('Error updating data:', error);
       setSnackbar({
         open: true,
-        message: 'Error saving form data',
+        message: 'Error updating form data',
         severity: 'error'
       });
     }
