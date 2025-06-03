@@ -6,6 +6,9 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { JsonSchema, UISchemaElement } from '@jsonforms/core';
+import { withJsonFormsControlProps } from '@jsonforms/react';
+import { ControlProps } from '@jsonforms/core';
+import { Button, Stack } from '@mui/material';
 
 interface AppProps { }
 
@@ -39,36 +42,45 @@ const schema = {
   required: ['name', 'dateOfBirth']
 };
 
-interface TiptapEditorProps {
-  data: string;
-  onChange: (value: string) => void;
-}
-
-const TiptapEditor: React.FC<TiptapEditorProps> = ({ data, onChange }) => {
+const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label, required, description, errors, visible }) => {
   const editor = useEditor({
     extensions: [StarterKit],
-    content: data,
+    content: data || '',
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      handleChange(path, editor.getHTML());
     },
   });
 
   return (
-    <div style={{ border: '1px solid #ccc', borderRadius: '4px', padding: '8px' }}>
-      <EditorContent editor={editor} />
+    <div style={{ marginBottom: '16px', display: visible === false ? 'none' : undefined }}>
+      <label style={{ fontWeight: 'bold', display: 'block', marginBottom: 4 }}>
+        {label}{required ? ' *' : ''}
+      </label>
+      {description && <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>{description}</div>}
+      <Stack direction="row" spacing={1} style={{ marginBottom: 8 }}>
+        <Button variant="outlined" size="small" onClick={() => editor?.chain().focus().toggleBold().run()} disabled={!editor}>Bold</Button>
+        <Button variant="outlined" size="small" onClick={() => editor?.chain().focus().toggleItalic().run()} disabled={!editor}>Italic</Button>
+      </Stack>
+      <div style={{ border: '1px solid #ccc', borderRadius: '4px', padding: '8px', minHeight: 80 }}>
+        <EditorContent editor={editor} />
+      </div>
+      {errors && <div style={{ color: 'red', fontSize: 12, marginTop: 4 }}>{errors}</div>}
     </div>
   );
 };
 
+const TiptapEditorControl = withJsonFormsControlProps(TiptapEditor);
+
 const customRenderers = [
   ...materialRenderers,
   {
-    tester: (uischema: UISchemaElement, schema: JsonSchema) => {
+    tester: (schema: JsonSchema) => {
       return schema?.format === 'html' ? 10 : -1;
     },
-    renderer: TiptapEditor
+    renderer: TiptapEditorControl
   }
 ];
+
 
 export const App: React.FC<AppProps> = () => {
   const [data, setData] = useState({});
