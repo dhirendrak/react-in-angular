@@ -6,15 +6,14 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { JsonSchema } from '@jsonforms/core';
 import { Button, Stack, Snackbar, Alert } from '@mui/material';
 import { TiptapEditorControl } from './components/TiptapEditor';
+import { htmlFormatTester } from './utils/schemaTesters';
 
 interface AppProps { }
 
 const customRenderers = [
   ...materialRenderers,
   {
-    tester: (schema: JsonSchema) => {
-      return schema?.format === 'html' ? 10 : -1;
-    },
+    tester: htmlFormatTester,
     renderer: TiptapEditorControl
   }
 ];

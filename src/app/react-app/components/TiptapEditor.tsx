@@ -19,7 +19,6 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
       <label style={{ fontWeight: 'bold', display: 'block', marginBottom: 4 }}>
         {label}{required ? ' *' : ''}
       </label>
-      {description && <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>{description}</div>}
       <Stack direction="row" spacing={1} style={{ marginBottom: 8 }}>
         <Button variant="outlined" size="small" onClick={() => editor?.chain().focus().toggleBold().run()} disabled={!editor}>Bold</Button>
         <Button variant="outlined" size="small" onClick={() => editor?.chain().focus().toggleItalic().run()} disabled={!editor}>Italic</Button>
