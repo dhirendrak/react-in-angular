@@ -6,15 +6,20 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { JsonSchema } from '@jsonforms/core';
 import { Button, Stack, Snackbar, Alert } from '@mui/material';
 import { TiptapEditorControl } from './components/TiptapEditor';
-import  htmlFormatTester  from './utils/schemaTesters';
+import { TiptapArrayEditorControl } from './components/TiptapArrayEditor';
+import { htmlStringTester, htmlArrayItemTester } from './utils/schemaTesters';
 
 interface AppProps { }
 
 const customRenderers = [
   ...materialRenderers,
   {
-    tester: htmlFormatTester,
+    tester: htmlStringTester,
     renderer: TiptapEditorControl
+  },
+  {
+    tester: htmlArrayItemTester,
+    renderer: TiptapArrayEditorControl
   }
 ];
 

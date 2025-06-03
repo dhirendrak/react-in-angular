@@ -52,7 +52,7 @@
     "occupation": "",
     "description": "new description ",
     "objectives": [
-      "new objective",
+      "<p>new objective 5</p>",
       "1 more objective"
     ]
   }
