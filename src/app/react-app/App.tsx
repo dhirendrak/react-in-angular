@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { JsonForms } from '@jsonforms/react';
 import { materialRenderers, materialCells } from '@jsonforms/material-renderers';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -8,7 +8,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { JsonSchema, UISchemaElement } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import { ControlProps } from '@jsonforms/core';
-import { Button, Stack } from '@mui/material';
+import { Button, Stack, Snackbar, Alert } from '@mui/material';
 
 interface AppProps { }
 
@@ -81,9 +81,58 @@ const customRenderers = [
   }
 ];
 
-
 export const App: React.FC<AppProps> = () => {
   const [data, setData] = useState({});
+  const [schema, setSchema] = useState<JsonSchema>({});
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+
+  useEffect(() => {
+    // Fetch schema from JSON Server
+    fetch('http://localhost:3001/schema')
+      .then(response => response.json())
+      .then(schemaData => setSchema(schemaData))
+      .catch(error => {
+        console.error('Error fetching schema:', error);
+        setSnackbar({
+          open: true,
+          message: 'Error loading form schema',
+          severity: 'error'
+        });
+      });
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/forms', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        setSnackbar({
+          open: true,
+          message: 'Form data saved successfully!',
+          severity: 'success'
+        });
+      } else {
+        throw new Error('Failed to save data');
+      }
+    } catch (error) {
+      console.error('Error saving data:', error);
+      setSnackbar({
+        open: true,
+        message: 'Error saving form data',
+        severity: 'error'
+      });
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   const theme = createTheme({
     palette: {
@@ -104,12 +153,30 @@ export const App: React.FC<AppProps> = () => {
             cells={materialCells}
             onChange={({ data }) => setData(data)}
           />
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleSave}
+            style={{ marginTop: '20px' }}
+          >
+            Save Form
+          </Button>
           <div style={{ marginTop: '20px' }}>
             <h3>Form Data:</h3>
             <pre>{JSON.stringify(data, null, 2)}</pre>
           </div>
         </div>
       </div>
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={6000} 
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 }; 

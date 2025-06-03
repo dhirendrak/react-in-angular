@@ -5,7 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "watch": "ng build --watch --configuration development"
+    "watch": "ng build --watch --configuration development",
+    "json-server": "json-server --watch db.json --port 3001"
   },
   "private": true,
   "dependencies": {
@@ -38,6 +39,7 @@
     "@angular/compiler-cli": "^17.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
+    "json-server": "^1.0.0-beta.3",
     "typescript": "~5.2.2"
   }
 }

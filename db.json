@@ -1,0 +1,45 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "title": "Name",
+        "description": "Enter your full name"
+      },
+      "dateOfBirth": {
+        "type": "string",
+        "format": "date",
+        "title": "Date of Birth",
+        "description": "Select your date of birth"
+      },
+      "occupation": {
+        "type": "string",
+        "title": "Occupation",
+        "description": "Select your occupation",
+        "enum": [
+          "Developer",
+          "Designer",
+          "Manager",
+          "Other"
+        ]
+      },
+      "description": {
+        "type": "string",
+        "title": "Description",
+        "description": "Enter a detailed description",
+        "format": "html"
+      }
+    },
+    "required": [
+      "name",
+      "dateOfBirth"
+    ]
+  },
+  "forms": [
+    {
+      "id": "8dc9",
+      "description": "The Description is updated"
+    }
+  ]
+}
