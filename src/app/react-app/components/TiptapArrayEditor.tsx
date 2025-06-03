@@ -1,20 +1,31 @@
 import React from 'react';
-import { ArrayControlProps, ControlProps } from '@jsonforms/core';
+import { ArrayControlProps } from '@jsonforms/core';
 import { withJsonFormsArrayControlProps } from '@jsonforms/react';
 import { Button, Stack } from '@mui/material';
 import { TiptapEditorControl } from './TiptapEditor';
 
-const TiptapArrayEditor: React.FC<ArrayControlProps> = ({ data, path, label, required, description, errors, visible }) => {
+interface ExtendedArrayControlProps extends ArrayControlProps {
+  handleChange: (path: string, value: any) => void;
+}
+
+const TiptapArrayEditor: React.FC<ExtendedArrayControlProps> = ({
+  data,
+  path,
+  label,
+  required,
+  description,
+  errors,
+  visible,
+  handleChange
+}) => {
   const addItem = () => {
     const newData = [...(data || []), ''];
-    // @ts-ignore - handleChange is provided by withJsonFormsArrayControlProps
     handleChange(path, newData);
   };
 
   const removeItem = (index: number) => {
     const newData = [...(data || [])];
     newData.splice(index, 1);
-    // @ts-ignore - handleChange is provided by withJsonFormsArrayControlProps
     handleChange(path, newData);
   };
 
@@ -38,14 +49,6 @@ const TiptapArrayEditor: React.FC<ArrayControlProps> = ({ data, path, label, req
               }}
               path={`${path}.${index}`}
               visible={true}
-              // @ts-ignore - These props are handled by the JsonForms context
-              data={item}
-              handleChange={(itemPath: string, value: string) => {
-                const newData = [...(data || [])];
-                newData[index] = value;
-                // @ts-ignore - handleChange is provided by withJsonFormsArrayControlProps
-                handleChange(path, newData);
-              }}
             />
             <Button
               variant="outlined"
@@ -67,4 +70,4 @@ const TiptapArrayEditor: React.FC<ArrayControlProps> = ({ data, path, label, req
   );
 };
 
-export const TiptapArrayEditorControl = withJsonFormsArrayControlProps(TiptapArrayEditor); 
+export const TiptapArrayEditorControl = withJsonFormsArrayControlProps(TiptapArrayEditor as React.ComponentType<ArrayControlProps>); 
