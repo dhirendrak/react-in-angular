@@ -7,7 +7,9 @@ import { JsonSchema } from '@jsonforms/core';
 import { Button, Stack, Snackbar, Alert } from '@mui/material';
 import { TiptapEditorControl } from './components/TiptapEditor';
 import { TiptapArrayEditorControl } from './components/TiptapArrayEditor';
+import { VirtualizedArrayEditorControl } from './components/VirtualizedArrayEditor';
 import { htmlStringTester, htmlArrayItemTester } from './utils/schemaTesters';
+import { virtualizedArrayTester } from './utils/virtualizedSchemaTesters';
 
 interface AppProps { }
 
@@ -16,6 +18,10 @@ const customRenderers = [
   {
     tester: htmlStringTester,
     renderer: TiptapEditorControl
+  },
+  {
+    tester: virtualizedArrayTester,
+    renderer: VirtualizedArrayEditorControl
   },
   {
     tester: htmlArrayItemTester,
@@ -110,7 +116,7 @@ export const App: React.FC<AppProps> = () => {
           </Button>
           <div style={{ marginTop: '20px' }}>
             <h3>Form Data:</h3>
-            <pre>{JSON.stringify(data, null, 2)}</pre>
+           {/* <pre>{JSON.stringify(data, null, 2)}</pre>  */}
           </div>
         </div>
       </div>
@@ -126,4 +132,4 @@ export const App: React.FC<AppProps> = () => {
       </Snackbar>
     </ThemeProvider>
   );
-}; 
+};
