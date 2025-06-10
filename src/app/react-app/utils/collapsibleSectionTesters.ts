@@ -18,10 +18,10 @@ export const collapsibleSectionTester = rankWith(
     // Check basic array structure
     const isArray = schema.type === 'array';
     const hasItems = schema.items && typeof schema.items === 'object' && !Array.isArray(schema.items);
-    
+
     // Check for collapsible option
     const hasCollapsibleOption = extendedSchema.options?.collapsible === true;
-    
+
     // Check if it's a sections array by looking at the title or items structure
     const itemsSchema = schema.items && typeof schema.items === 'object' && !Array.isArray(schema.items) ? schema.items : null;
     const hasSectionRef = itemsSchema && '$ref' in itemsSchema && typeof itemsSchema.$ref === 'string' && itemsSchema.$ref.includes('section');
@@ -30,12 +30,11 @@ export const collapsibleSectionTester = rankWith(
     const result = Boolean(
       isArray &&
       hasItems &&
-      hasCollapsibleOption &&
       isSectionsArray
     );
-    
+
     // Only log when we have a potential match to reduce noise
-    if (isArray && hasItems && hasCollapsibleOption) {
+    if (isArray && hasItems) {
       console.log('CollapsibleSectionTester - Potential match found:', {
         type: schema.type,
         title: schema.title,
@@ -46,7 +45,7 @@ export const collapsibleSectionTester = rankWith(
         result
       });
     }
-    
+
     return result;
   })
 );
