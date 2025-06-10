@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ControlProps } from '@jsonforms/core';
-import { withJsonFormsControlProps } from '@jsonforms/react';
+import { ArrayControlProps } from '@jsonforms/core';
+import { withJsonFormsArrayControlProps } from '@jsonforms/react';
 import { 
   Button, 
   Stack, 
@@ -11,6 +11,7 @@ import {
   TextField
 } from '@mui/material';
 import { ExpandMore, ExpandLess, Add, Delete } from '@mui/icons-material';
+import { TiptapEditorControl } from './TiptapEditor';
 
 interface Section {
   title?: string;
@@ -26,7 +27,11 @@ interface Entry {
   };
 }
 
-const CollapsibleSectionEditor: React.FC<ControlProps> = ({
+interface ExtendedArrayControlProps extends ArrayControlProps {
+  handleChange: (path: string, value: any) => void;
+}
+
+const CollapsibleSectionEditor: React.FC<ExtendedArrayControlProps> = ({
   data,
   path,
   label,
@@ -172,103 +177,113 @@ const CollapsibleSectionEditor: React.FC<ControlProps> = ({
                   />
                 </Box>
 
-                {/* Entries */}
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    Entries
-                  </Typography>
-                  <Stack spacing={2}>
-                    {(section.entries || []).map((entry: Entry, entryIndex: number) => (
-                      <Box
-                        key={entryIndex}
-                        sx={{
-                          p: 2,
-                          border: '1px solid #e0e0e0',
-                          borderRadius: 1,
-                          position: 'relative'
-                        }}
-                      >
-                        <IconButton
-                          size="small"
-                          onClick={() => removeEntry(sectionIndex, entryIndex)}
+                {/* Entries - Only render when expanded */}
+                {expandedSections.has(sectionIndex) && (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                      Entries
+                    </Typography>
+                    <Stack spacing={2}>
+                      {(section.entries || []).map((entry: Entry, entryIndex: number) => (
+                        <Box
+                          key={entryIndex}
                           sx={{
-                            position: 'absolute',
-                            top: 8,
-                            right: 8,
-                            backgroundColor: 'rgba(255, 255, 255, 0.8)'
+                            p: 2,
+                            border: '1px solid #e0e0e0',
+                            borderRadius: 1,
+                            position: 'relative'
                           }}
                         >
-                          <Delete />
-                        </IconButton>
-
-                        <Typography variant="caption" sx={{ mb: 1, display: 'block' }}>
-                          Entry {entryIndex + 1}
-                        </Typography>
-
-                        {/* Term */}
-                        <Box sx={{ mb: 2 }}>
-                          <Typography variant="body2" sx={{ mb: 1 }}>
-                            Term
-                          </Typography>
-                          <TextField
-                            fullWidth
+                          <IconButton
                             size="small"
-                            value={entry.term || ''}
-                            onChange={(e) => updateEntry(sectionIndex, entryIndex, 'term', e.target.value)}
-                            placeholder="Enter term"
-                            variant="outlined"
-                          />
-                        </Box>
+                            onClick={() => removeEntry(sectionIndex, entryIndex)}
+                            sx={{
+                              position: 'absolute',
+                              top: 8,
+                              right: 8,
+                              backgroundColor: 'rgba(255, 255, 255, 0.8)'
+                            }}
+                          >
+                            <Delete />
+                          </IconButton>
 
-                        {/* Definition */}
-                        <Box sx={{ mb: 2 }}>
-                          <Typography variant="body2" sx={{ mb: 1 }}>
-                            Definition
+                          <Typography variant="caption" sx={{ mb: 1, display: 'block' }}>
+                            Entry {entryIndex + 1}
                           </Typography>
-                          <TextField
-                            fullWidth
-                            multiline
-                            rows={3}
-                            size="small"
-                            value={entry.definition || ''}
-                            onChange={(e) => updateEntry(sectionIndex, entryIndex, 'definition', e.target.value)}
-                            placeholder="Enter definition"
-                            variant="outlined"
-                          />
-                        </Box>
 
-                        {/* Media URLs */}
-                        <Box sx={{ mb: 2 }}>
-                          <Typography variant="body2" sx={{ mb: 1 }}>
-                            Media URLs
-                          </Typography>
-                          <Stack spacing={1}>
-                            <TextField
-                              fullWidth
-                              size="small"
-                              placeholder="Image URL"
-                              value={entry.media?.image || ''}
-                              onChange={(e) => updateEntry(sectionIndex, entryIndex, 'media', {
-                                ...entry.media,
-                                image: e.target.value
-                              })}
+                          {/* Term */}
+                          <Box sx={{ mb: 2 }}>
+                            <Typography variant="body2" sx={{ mb: 1 }}>
+                              Term
+                            </Typography>
+                            <TiptapEditorControl
+                              uischema={{
+                                type: 'Control',
+                                scope: `${path}.${sectionIndex}.entries.${entryIndex}.term`,
+                                label: `Term ${entryIndex + 1}`
+                              }}
+                              schema={{
+                                type: 'string',
+                                format: 'html'
+                              }}
+                              path={`${path}.${sectionIndex}.entries.${entryIndex}.term`}
+                              visible={true}
                             />
-                            <TextField
-                              fullWidth
-                              size="small"
-                              placeholder="Audio URL"
-                              value={entry.media?.audio || ''}
-                              onChange={(e) => updateEntry(sectionIndex, entryIndex, 'media', {
-                                ...entry.media,
-                                audio: e.target.value
-                              })}
+                          </Box>
+
+                          {/* Definition */}
+                          <Box sx={{ mb: 2 }}>
+                            <Typography variant="body2" sx={{ mb: 1 }}>
+                              Definition
+                            </Typography>
+                            <TiptapEditorControl
+                              uischema={{
+                                type: 'Control',
+                                scope: `${path}.${sectionIndex}.entries.${entryIndex}.definition`,
+                                label: `Definition ${entryIndex + 1}`
+                              }}
+                              schema={{
+                                type: 'string',
+                                format: 'html'
+                              }}
+                              path={`${path}.${sectionIndex}.entries.${entryIndex}.definition`}
+                              visible={true}
                             />
-                          </Stack>
+                          </Box>
+
+                          {/* Media URLs */}
+                          <Box sx={{ mb: 2 }}>
+                            <Typography variant="body2" sx={{ mb: 1 }}>
+                              Media URLs
+                            </Typography>
+                            <Stack spacing={1}>
+                              <TextField
+                                fullWidth
+                                size="small"
+                                placeholder="Image URL"
+                                value={entry.media?.image || ''}
+                                onChange={(e) => updateEntry(sectionIndex, entryIndex, 'media', {
+                                  ...entry.media,
+                                  image: e.target.value
+                                })}
+                              />
+                              <TextField
+                                fullWidth
+                                size="small"
+                                placeholder="Audio URL"
+                                value={entry.media?.audio || ''}
+                                onChange={(e) => updateEntry(sectionIndex, entryIndex, 'media', {
+                                  ...entry.media,
+                                  audio: e.target.value
+                                })}
+                              />
+                            </Stack>
+                          </Box>
                         </Box>
-                      </Box>
-                    ))}
-                  </Stack>
-                </Box>
+                      ))}
+                    </Stack>
+                  </Box>
+                )}
 
                 <Button
                   variant="outlined"
@@ -302,4 +317,4 @@ const CollapsibleSectionEditor: React.FC<ControlProps> = ({
   );
 };
 
-export const CollapsibleSectionEditorControl = withJsonFormsControlProps(CollapsibleSectionEditor); 
+export const CollapsibleSectionEditorControl = withJsonFormsArrayControlProps(CollapsibleSectionEditor as React.ComponentType<ArrayControlProps>); 
