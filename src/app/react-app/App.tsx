@@ -8,8 +8,10 @@ import { Button, Stack, Snackbar, Alert } from '@mui/material';
 import { TiptapEditorControl } from './components/TiptapEditor';
 import { TiptapArrayEditorControl } from './components/TiptapArrayEditor';
 import { VirtualizedArrayEditorControl } from './components/VirtualizedArrayEditor';
+import { CollapsibleSectionEditorControl } from './components/CollapsibleSectionEditor';
 import { htmlStringTester, htmlArrayItemTester } from './utils/schemaTesters';
 import { virtualizedArrayTester } from './utils/virtualizedSchemaTesters';
+import { collapsibleSectionTester } from './utils/collapsibleSectionTesters';
 
 interface AppProps { }
 
@@ -26,6 +28,10 @@ const customRenderers = [
   {
     tester: htmlArrayItemTester,
     renderer: TiptapArrayEditorControl
+  },
+  {
+    tester: collapsibleSectionTester,
+    renderer: CollapsibleSectionEditorControl
   }
 ];
 
