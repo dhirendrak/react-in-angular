@@ -36,7 +36,8 @@ import {
   FormatListNumbered,
   Title as TitleIcon,
   TextFields,
-  Code as HtmlIcon
+  Code as HtmlIcon,
+  FormatClear
 } from '@mui/icons-material';
 
 const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label, required, description, errors, visible }) => {
@@ -205,6 +206,18 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
             </ToggleButton>
           </ToggleButtonGroup>
 
+          {/* Remove Formatting */}
+          <ToggleButton
+            value="clearFormatting"
+            size="small"
+            onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}
+            disabled={editor.state.selection.empty}
+            selected={false}
+          >
+            <Tooltip title="Remove Formatting">
+              <FormatClear fontSize="small" />
+            </Tooltip>
+          </ToggleButton>
 
           {/* Code Formatting */}
           <ToggleButtonGroup size="small" value={editor.isActive('code') ? 'code' : ''}>
