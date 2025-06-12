@@ -37,7 +37,10 @@ import {
   Title as TitleIcon,
   TextFields,
   Code as HtmlIcon,
-  FormatClear
+  FormatClear,
+  ContentCut,
+  ContentCopy,
+  ContentPaste
 } from '@mui/icons-material';
 
 const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label, required, description, errors, visible }) => {
@@ -92,6 +95,67 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
     handleChange(path, newHtml);
   };
 
+  // Cut, Copy, Paste handlers
+  const handleCut = () => {
+    if (isHtmlView) {
+      const textField = document.querySelector('textarea') as HTMLTextAreaElement;
+      if (textField) {
+        textField.focus();
+        document.execCommand('cut');
+      }
+    } else {
+      // Use Tiptap's deleteSelection command for cut functionality
+      const { from, to } = editor.state.selection;
+      if (from !== to) {
+        const text = editor.state.doc.textBetween(from, to);
+        navigator.clipboard.writeText(text).then(() => {
+          editor.chain().focus().deleteSelection().run();
+        }).catch(() => {
+          // Fallback for older browsers
+          editor.chain().focus().deleteSelection().run();
+        });
+      }
+    }
+  };
+
+  const handleCopy = () => {
+    if (isHtmlView) {
+      const textField = document.querySelector('textarea') as HTMLTextAreaElement;
+      if (textField) {
+        textField.focus();
+        document.execCommand('copy');
+      }
+    } else {
+      // Use Tiptap's getHTML for copy functionality
+      const { from, to } = editor.state.selection;
+      if (from !== to) {
+        const html = editor.state.doc.textBetween(from, to);
+        navigator.clipboard.writeText(html).catch(() => {
+          // Fallback for older browsers
+          document.execCommand('copy');
+        });
+      }
+    }
+  };
+
+  const handlePaste = async () => {
+    if (isHtmlView) {
+      const textField = document.querySelector('textarea') as HTMLTextAreaElement;
+      if (textField) {
+        textField.focus();
+        document.execCommand('paste');
+      }
+    } else {
+      try {
+        const text = await navigator.clipboard.readText();
+        editor.chain().focus().insertContent(text).run();
+      } catch (error) {
+        // Fallback to execCommand for older browsers
+        editor.chain().focus().insertContent('').run();
+      }
+    }
+  };
+
   return (
     <div style={{ marginBottom: '16px', display: visible === false ? 'none' : undefined }}>
       <label style={{ fontWeight: 'bold', display: 'block', marginBottom: 4 }}>
@@ -120,6 +184,39 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
         >
           <Tooltip title={isHtmlView ? "Switch to Formatted View" : "Switch to HTML View"}>
             <HtmlIcon fontSize="small" />
+          </Tooltip>
+        </ToggleButton>
+
+        {/* Cut, Copy, Paste buttons */}
+        <ToggleButton
+          size="small"
+          value="cut"
+          onClick={handleCut}
+          disabled={isHtmlView ? false : editor.state.selection.empty}
+        >
+          <Tooltip title="Cut">
+            <ContentCut fontSize="small" />
+          </Tooltip>
+        </ToggleButton>
+
+        <ToggleButton
+          size="small"
+          value="copy"
+          onClick={handleCopy}
+          disabled={isHtmlView ? false : editor.state.selection.empty}
+        >
+          <Tooltip title="Copy">
+            <ContentCopy fontSize="small" />
+          </Tooltip>
+        </ToggleButton>
+
+        <ToggleButton
+          size="small"
+          value="paste"
+          onClick={handlePaste}
+        >
+          <Tooltip title="Paste">
+            <ContentPaste fontSize="small" />
           </Tooltip>
         </ToggleButton>
 
