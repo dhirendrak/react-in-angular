@@ -14,10 +14,10 @@ import Blockquote from '@tiptap/extension-blockquote';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import { ControlProps } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
-import { 
-  Button, 
-  Stack, 
-  ToggleButton, 
+import {
+  Button,
+  Stack,
+  ToggleButton,
   ToggleButtonGroup,
   Divider,
   Tooltip,
@@ -95,64 +95,38 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
     handleChange(path, newHtml);
   };
 
-  // Cut, Copy, Paste handlers
+  // Cut, Copy, Paste handlers - Only for formatted view
   const handleCut = () => {
-    if (isHtmlView) {
-      const textField = document.querySelector('textarea') as HTMLTextAreaElement;
-      if (textField) {
-        textField.focus();
-        document.execCommand('cut');
-      }
-    } else {
-      // Use Tiptap's deleteSelection command for cut functionality
-      const { from, to } = editor.state.selection;
-      if (from !== to) {
-        const text = editor.state.doc.textBetween(from, to);
-        navigator.clipboard.writeText(text).then(() => {
-          editor.chain().focus().deleteSelection().run();
-        }).catch(() => {
-          // Fallback for older browsers
-          editor.chain().focus().deleteSelection().run();
-        });
-      }
+    // Only works in formatted view since button is disabled in HTML view
+    const { from, to } = editor.state.selection;
+    if (from !== to) {
+      const text = editor.state.doc.textBetween(from, to);
+      navigator.clipboard.writeText(text).then(() => {
+        editor.chain().focus().deleteSelection().run();
+      }).catch(() => {
+        // Fallback for older browsers
+        editor.chain().focus().deleteSelection().run();
+      });
     }
   };
 
   const handleCopy = () => {
-    if (isHtmlView) {
-      const textField = document.querySelector('textarea') as HTMLTextAreaElement;
-      if (textField) {
-        textField.focus();
-        document.execCommand('copy');
-      }
-    } else {
-      // Use Tiptap's getHTML for copy functionality
-      const { from, to } = editor.state.selection;
-      if (from !== to) {
-        const html = editor.state.doc.textBetween(from, to);
-        navigator.clipboard.writeText(html).catch(() => {
-          // Fallback for older browsers
-          document.execCommand('copy');
-        });
-      }
+    // Only works in formatted view since button is disabled in HTML view
+    const { from, to } = editor.state.selection;
+    if (from !== to) {
+      const text = editor.state.doc.textBetween(from, to);
+      navigator.clipboard.writeText(text);
     }
   };
 
   const handlePaste = async () => {
-    if (isHtmlView) {
-      const textField = document.querySelector('textarea') as HTMLTextAreaElement;
-      if (textField) {
-        textField.focus();
-        document.execCommand('paste');
-      }
-    } else {
-      try {
-        const text = await navigator.clipboard.readText();
-        editor.chain().focus().insertContent(text).run();
-      } catch (error) {
-        // Fallback to execCommand for older browsers
-        editor.chain().focus().insertContent('').run();
-      }
+    // Only works in formatted view since button is disabled in HTML view
+    try {
+      const text = await navigator.clipboard.readText();
+      editor.chain().focus().insertContent(text).run();
+    } catch (error) {
+      // Fallback to execCommand for older browsers
+      editor.chain().focus().insertContent('').run();
     }
   };
 
@@ -161,13 +135,13 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
       <label style={{ fontWeight: 'bold', display: 'block', marginBottom: 4 }}>
         {label}{required ? ' *' : ''}
       </label>
-      
+
       {/* Text Formatting Toolbar */}
-      <Stack 
-        direction="row" 
-        spacing={0.5} 
-        style={{ 
-          marginBottom: 8, 
+      <Stack
+        direction="row"
+        spacing={0.5}
+        style={{
+          marginBottom: 8,
           padding: '8px',
           border: '1px solid #e0e0e0',
           borderRadius: '4px',
@@ -176,7 +150,7 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
         divider={<Divider orientation="vertical" flexItem />}
       >
         {/* View Toggle */}
-        <ToggleButton 
+        <ToggleButton
           size="small"
           value="html"
           onClick={handleViewToggle}
@@ -187,12 +161,12 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           </Tooltip>
         </ToggleButton>
 
-        {/* Cut, Copy, Paste buttons */}
+        {/* Cut, Copy, Paste buttons - Only enabled in formatted view */}
         <ToggleButton
           size="small"
           value="cut"
           onClick={handleCut}
-          disabled={isHtmlView ? false : editor.state.selection.empty}
+          disabled={isHtmlView || editor.state.selection.empty}
         >
           <Tooltip title="Cut">
             <ContentCut fontSize="small" />
@@ -203,7 +177,7 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           size="small"
           value="copy"
           onClick={handleCopy}
-          disabled={isHtmlView ? false : editor.state.selection.empty}
+          disabled={isHtmlView || editor.state.selection.empty}
         >
           <Tooltip title="Copy">
             <ContentCopy fontSize="small" />
@@ -214,6 +188,7 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           size="small"
           value="paste"
           onClick={handlePaste}
+          disabled={isHtmlView}
         >
           <Tooltip title="Paste">
             <ContentPaste fontSize="small" />
@@ -252,8 +227,8 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
 
           {/* Text Formatting */}
           <ToggleButtonGroup size="small" value={editor.isActive('bold') ? 'bold' : ''}>
-            <ToggleButton 
-              value="bold" 
+            <ToggleButton
+              value="bold"
               size="small"
               onClick={() => editor.chain().focus().toggleBold().run()}
               selected={editor.isActive('bold')}
@@ -265,8 +240,8 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           </ToggleButtonGroup>
 
           <ToggleButtonGroup size="small" value={editor.isActive('italic') ? 'italic' : ''}>
-            <ToggleButton 
-              value="italic" 
+            <ToggleButton
+              value="italic"
               size="small"
               onClick={() => editor.chain().focus().toggleItalic().run()}
               selected={editor.isActive('italic')}
@@ -278,8 +253,8 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           </ToggleButtonGroup>
 
           <ToggleButtonGroup size="small" value={editor.isActive('underline') ? 'underline' : ''}>
-            <ToggleButton 
-              value="underline" 
+            <ToggleButton
+              value="underline"
               size="small"
               onClick={() => editor.chain().focus().toggleUnderline().run()}
               selected={editor.isActive('underline')}
@@ -291,8 +266,8 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           </ToggleButtonGroup>
 
           <ToggleButtonGroup size="small" value={editor.isActive('strike') ? 'strike' : ''}>
-            <ToggleButton 
-              value="strike" 
+            <ToggleButton
+              value="strike"
               size="small"
               onClick={() => editor.chain().focus().toggleStrike().run()}
               selected={editor.isActive('strike')}
@@ -318,8 +293,8 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
 
           {/* Code Formatting */}
           <ToggleButtonGroup size="small" value={editor.isActive('code') ? 'code' : ''}>
-            <ToggleButton 
-              value="code" 
+            <ToggleButton
+              value="code"
               size="small"
               onClick={() => editor.chain().focus().toggleCode().run()}
               selected={editor.isActive('code')}
@@ -331,8 +306,8 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           </ToggleButtonGroup>
 
           <ToggleButtonGroup size="small" value={editor.isActive('codeBlock') ? 'codeBlock' : ''}>
-            <ToggleButton 
-              value="codeBlock" 
+            <ToggleButton
+              value="codeBlock"
               size="small"
               onClick={() => editor.chain().focus().toggleCodeBlock().run()}
               selected={editor.isActive('codeBlock')}
@@ -346,8 +321,8 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
 
           {/* Lists */}
           <ToggleButtonGroup size="small" value={editor.isActive('bulletList') ? 'bulletList' : ''}>
-            <ToggleButton 
-              value="bulletList" 
+            <ToggleButton
+              value="bulletList"
               size="small"
               onClick={() => editor.chain().focus().toggleBulletList().run()}
               selected={editor.isActive('bulletList')}
@@ -359,8 +334,8 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           </ToggleButtonGroup>
 
           <ToggleButtonGroup size="small" value={editor.isActive('orderedList') ? 'orderedList' : ''}>
-            <ToggleButton 
-              value="orderedList" 
+            <ToggleButton
+              value="orderedList"
               size="small"
               onClick={() => editor.chain().focus().toggleOrderedList().run()}
               selected={editor.isActive('orderedList')}
@@ -374,8 +349,8 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
 
           {/* Block Elements */}
           <ToggleButtonGroup size="small" value={editor.isActive('blockquote') ? 'blockquote' : ''}>
-            <ToggleButton 
-              value="blockquote" 
+            <ToggleButton
+              value="blockquote"
               size="small"
               onClick={() => editor.chain().focus().toggleBlockquote().run()}
               selected={editor.isActive('blockquote')}
@@ -397,13 +372,13 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           value={htmlContent}
           onChange={handleHtmlChange}
           minRows={4}
-          style={{ 
-            border: '1px solid #ccc', 
+          style={{
+            border: '1px solid #ccc',
             borderRadius: '4px',
-            minHeight: 80 
+            minHeight: 80
           }}
           InputProps={{
-            style: { 
+            style: {
               fontFamily: 'monospace',
               fontSize: '12px'
             }
@@ -414,7 +389,7 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           <EditorContent editor={editor} />
         </div>
       )}
-      
+
       {errors && <div style={{ color: 'red', fontSize: 12, marginTop: 4 }}>{errors}</div>}
     </div>
   );
