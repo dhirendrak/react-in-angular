@@ -45,12 +45,15 @@ import {
   FormatAlignLeft,
   FormatAlignCenter,
   FormatAlignRight,
-  FormatAlignJustify
+  FormatAlignJustify,
+  Fullscreen,
+  FullscreenExit
 } from '@mui/icons-material';
 
 const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label, required, description, errors, visible }) => {
   const [isHtmlView, setIsHtmlView] = useState(false);
   const [htmlContent, setHtmlContent] = useState(data || '');
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -98,6 +101,10 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
     setIsHtmlView(!isHtmlView);
   };
 
+  const handleFullscreenToggle = () => {
+    setIsFullscreen(!isFullscreen);
+  };
+
   const handleHtmlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newHtml = event.target.value;
     setHtmlContent(newHtml);
@@ -140,7 +147,19 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
   };
 
   return (
-    <div style={{ marginBottom: '16px', display: visible === false ? 'none' : undefined }}>
+    <div style={{ 
+      marginBottom: '16px', 
+      display: visible === false ? 'none' : undefined,
+      position: isFullscreen ? 'fixed' : 'relative',
+      top: isFullscreen ? 0 : 'auto',
+      left: isFullscreen ? 0 : 'auto',
+      right: isFullscreen ? 0 : 'auto',
+      bottom: isFullscreen ? 0 : 'auto',
+      zIndex: isFullscreen ? 9999 : 'auto',
+      backgroundColor: isFullscreen ? 'white' : 'transparent',
+      padding: isFullscreen ? '20px' : '0',
+      boxShadow: isFullscreen ? '0 0 20px rgba(0,0,0,0.3)' : 'none'
+    }}>
       <label style={{ fontWeight: 'bold', display: 'block', marginBottom: 4 }}>
         {label}{required ? ' *' : ''}
       </label>
@@ -167,6 +186,18 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
         >
           <Tooltip title={isHtmlView ? "Switch to Formatted View" : "Switch to HTML View"}>
             <HtmlIcon fontSize="small" />
+          </Tooltip>
+        </ToggleButton>
+
+        {/* Fullscreen Toggle */}
+        <ToggleButton
+          size="small"
+          value="fullscreen"
+          onClick={handleFullscreenToggle}
+          selected={isFullscreen}
+        >
+          <Tooltip title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}>
+            {isFullscreen ? <FullscreenExit fontSize="small" /> : <Fullscreen fontSize="small" />}
           </Tooltip>
         </ToggleButton>
 
@@ -431,11 +462,11 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           variant="outlined"
           value={htmlContent}
           onChange={handleHtmlChange}
-          minRows={4}
+          minRows={isFullscreen ? 20 : 4}
           style={{
             border: '1px solid #ccc',
             borderRadius: '4px',
-            minHeight: 80
+            minHeight: isFullscreen ? 'calc(100vh - 200px)' : 80
           }}
           InputProps={{
             style: {
@@ -445,7 +476,12 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           }}
         />
       ) : (
-        <div style={{ border: '1px solid #ccc', borderRadius: '4px', padding: '8px', minHeight: 80 }}>
+        <div style={{ 
+          border: '1px solid #ccc', 
+          borderRadius: '4px', 
+          padding: '8px', 
+          minHeight: isFullscreen ? 'calc(100vh - 200px)' : 80 
+        }}>
           <EditorContent editor={editor} />
         </div>
       )}
