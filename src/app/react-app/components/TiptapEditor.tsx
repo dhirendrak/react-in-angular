@@ -13,6 +13,8 @@ import ListItem from '@tiptap/extension-list-item';
 import Blockquote from '@tiptap/extension-blockquote';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import TextAlign from '@tiptap/extension-text-align';
+import Superscript from '@tiptap/extension-superscript';
+import Subscript from '@tiptap/extension-subscript';
 import { ControlProps } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import {
@@ -47,7 +49,9 @@ import {
   FormatAlignRight,
   FormatAlignJustify,
   Fullscreen,
-  FullscreenExit
+  FullscreenExit,
+  Superscript as SuperscriptIcon,
+  Subscript as SubscriptIcon
 } from '@mui/icons-material';
 
 const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label, required, description, errors, visible }) => {
@@ -74,7 +78,9 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
       TextAlign.configure({
         types: ['heading', 'paragraph'],
         alignments: ['left', 'center', 'right', 'justify']
-      })
+      }),
+      Superscript,
+      Subscript
     ],
     content: data || '',
     onUpdate: ({ editor }) => {
@@ -314,6 +320,33 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
             >
               <Tooltip title="Strikethrough">
                 <StrikethroughS fontSize="small" />
+              </Tooltip>
+            </ToggleButton>
+          </ToggleButtonGroup>
+
+          {/* Superscript and Subscript */}
+          <ToggleButtonGroup size="small" value={editor.isActive('superscript') ? 'superscript' : ''}>
+            <ToggleButton
+              value="superscript"
+              size="small"
+              onClick={() => editor.chain().focus().toggleSuperscript().run()}
+              selected={editor.isActive('superscript')}
+            >
+              <Tooltip title="Superscript">
+                <SuperscriptIcon fontSize="small" />
+              </Tooltip>
+            </ToggleButton>
+          </ToggleButtonGroup>
+
+          <ToggleButtonGroup size="small" value={editor.isActive('subscript') ? 'subscript' : ''}>
+            <ToggleButton
+              value="subscript"
+              size="small"
+              onClick={() => editor.chain().focus().toggleSubscript().run()}
+              selected={editor.isActive('subscript')}
+            >
+              <Tooltip title="Subscript">
+                <SubscriptIcon fontSize="small" />
               </Tooltip>
             </ToggleButton>
           </ToggleButtonGroup>
