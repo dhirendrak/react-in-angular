@@ -12,6 +12,7 @@ import OrderedList from '@tiptap/extension-ordered-list';
 import ListItem from '@tiptap/extension-list-item';
 import Blockquote from '@tiptap/extension-blockquote';
 import HorizontalRule from '@tiptap/extension-horizontal-rule';
+import TextAlign from '@tiptap/extension-text-align';
 import { ControlProps } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import {
@@ -40,7 +41,11 @@ import {
   FormatClear,
   ContentCut,
   ContentCopy,
-  ContentPaste
+  ContentPaste,
+  FormatAlignLeft,
+  FormatAlignCenter,
+  FormatAlignRight,
+  FormatAlignJustify
 } from '@mui/icons-material';
 
 const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label, required, description, errors, visible }) => {
@@ -62,7 +67,11 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
       OrderedList,
       ListItem,
       Blockquote,
-      HorizontalRule
+      HorizontalRule,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+        alignments: ['left', 'center', 'right', 'justify']
+      })
     ],
     content: data || '',
     onUpdate: ({ editor }) => {
@@ -274,6 +283,57 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
             >
               <Tooltip title="Strikethrough">
                 <StrikethroughS fontSize="small" />
+              </Tooltip>
+            </ToggleButton>
+          </ToggleButtonGroup>
+
+          {/* Text Alignment */}
+          <ToggleButtonGroup 
+            size="small" 
+            value={editor.isActive({ textAlign: 'left' }) ? 'left' : 
+                   editor.isActive({ textAlign: 'center' }) ? 'center' : 
+                   editor.isActive({ textAlign: 'right' }) ? 'right' : 
+                   editor.isActive({ textAlign: 'justify' }) ? 'justify' : 'left'}
+            exclusive
+          >
+            <ToggleButton
+              value="left"
+              size="small"
+              onClick={() => editor.chain().focus().setTextAlign('left').run()}
+              selected={editor.isActive({ textAlign: 'left' })}
+            >
+              <Tooltip title="Align Left">
+                <FormatAlignLeft fontSize="small" />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton
+              value="center"
+              size="small"
+              onClick={() => editor.chain().focus().setTextAlign('center').run()}
+              selected={editor.isActive({ textAlign: 'center' })}
+            >
+              <Tooltip title="Align Center">
+                <FormatAlignCenter fontSize="small" />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton
+              value="right"
+              size="small"
+              onClick={() => editor.chain().focus().setTextAlign('right').run()}
+              selected={editor.isActive({ textAlign: 'right' })}
+            >
+              <Tooltip title="Align Right">
+                <FormatAlignRight fontSize="small" />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton
+              value="justify"
+              size="small"
+              onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+              selected={editor.isActive({ textAlign: 'justify' })}
+            >
+              <Tooltip title="Justify">
+                <FormatAlignJustify fontSize="small" />
               </Tooltip>
             </ToggleButton>
           </ToggleButtonGroup>
