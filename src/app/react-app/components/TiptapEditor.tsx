@@ -15,6 +15,10 @@ import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import TextAlign from '@tiptap/extension-text-align';
 import Superscript from '@tiptap/extension-superscript';
 import Subscript from '@tiptap/extension-subscript';
+import Table from '@tiptap/extension-table';
+import TableRow from '@tiptap/extension-table-row';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
 import { ControlProps } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import {
@@ -24,7 +28,15 @@ import {
   ToggleButtonGroup,
   Divider,
   Tooltip,
-  TextField
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 import {
   FormatBold,
@@ -51,13 +63,17 @@ import {
   Fullscreen,
   FullscreenExit,
   Superscript as SuperscriptIcon,
-  Subscript as SubscriptIcon
+  Subscript as SubscriptIcon,
+  TableChart
 } from '@mui/icons-material';
 
 const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label, required, description, errors, visible }) => {
   const [isHtmlView, setIsHtmlView] = useState(false);
   const [htmlContent, setHtmlContent] = useState(data || '');
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [tableDialogOpen, setTableDialogOpen] = useState(false);
+  const [tableRows, setTableRows] = useState(3);
+  const [tableCols, setTableCols] = useState(3);
 
   const editor = useEditor({
     extensions: [
@@ -80,7 +96,13 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
         alignments: ['left', 'center', 'right', 'justify']
       }),
       Superscript,
-      Subscript
+      Subscript,
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     content: data || '',
     onUpdate: ({ editor }) => {
@@ -115,6 +137,19 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
     const newHtml = event.target.value;
     setHtmlContent(newHtml);
     handleChange(path, newHtml);
+  };
+
+  const handleTableDialogOpen = () => {
+    setTableDialogOpen(true);
+  };
+
+  const handleTableDialogClose = () => {
+    setTableDialogOpen(false);
+  };
+
+  const handleInsertTable = () => {
+    editor.chain().focus().insertTable({ rows: tableRows, cols: tableCols, withHeaderRow: true }).run();
+    setTableDialogOpen(false);
   };
 
   // Cut, Copy, Paste handlers - Only for formatted view
@@ -484,8 +519,57 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
               </Tooltip>
             </ToggleButton>
           </ToggleButtonGroup>
+
+          {/* Table */}
+          <ToggleButton
+            size="small"
+            value="table"
+            onClick={handleTableDialogOpen}
+            selected={false}
+          >
+            <Tooltip title="Insert Table">
+              <TableChart fontSize="small" />
+            </Tooltip>
+          </ToggleButton>
         </div>
       </Stack>
+
+      {/* Table Dialog */}
+      <Dialog open={tableDialogOpen} onClose={handleTableDialogClose}>
+        <DialogTitle>Insert Table</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ minWidth: 300, pt: 1 }}>
+            <FormControl fullWidth>
+              <InputLabel>Number of Rows</InputLabel>
+              <Select
+                value={tableRows}
+                label="Number of Rows"
+                onChange={(e) => setTableRows(Number(e.target.value))}
+              >
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                  <MenuItem key={num} value={num}>{num}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel>Number of Columns</InputLabel>
+              <Select
+                value={tableCols}
+                label="Number of Columns"
+                onChange={(e) => setTableCols(Number(e.target.value))}
+              >
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                  <MenuItem key={num} value={num}>{num}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleTableDialogClose}>Cancel</Button>
+          <Button onClick={handleInsertTable} variant="contained">Insert Table</Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Content Area */}
       {isHtmlView ? (
