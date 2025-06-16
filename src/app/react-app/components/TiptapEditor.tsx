@@ -296,13 +296,36 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
                 <TextFields fontSize="small" />
               </Tooltip>
             </ToggleButton>
-            {headingLevels.map(level => (
-              <ToggleButton key={level} value={level} size="small">
-                <Tooltip title={`Heading ${level}`}>
-                  <TitleIcon fontSize="small" />
-                </Tooltip>
-              </ToggleButton>
-            ))}
+            <ToggleButton value={1} size="small">
+              <Tooltip title="Heading 1">
+                <TitleIcon fontSize="small" />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton value={2} size="small">
+              <Tooltip title="Heading 2">
+                <TitleIcon fontSize="small" />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton value={3} size="small">
+              <Tooltip title="Heading 3">
+                <TitleIcon fontSize="small" />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton value={4} size="small">
+              <Tooltip title="Heading 4">
+                <TitleIcon fontSize="small" />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton value={5} size="small">
+              <Tooltip title="Heading 5">
+                <TitleIcon fontSize="small" />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton value={6} size="small">
+              <Tooltip title="Heading 6">
+                <TitleIcon fontSize="small" />
+              </Tooltip>
+            </ToggleButton>
           </ToggleButtonGroup>
 
 
