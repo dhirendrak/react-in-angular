@@ -60,7 +60,9 @@ import {
   FullscreenExit,
   Superscript as SuperscriptIcon,
   Subscript as SubscriptIcon,
-  TableChart
+  TableChart,
+  FormatIndentIncrease,
+  FormatIndentDecrease
 } from '@mui/icons-material';
 
 const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label, required, description, errors, visible }) => {
@@ -524,6 +526,29 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
             </ToggleButton>
           </ToggleButtonGroup>
 
+          {/* List Indentation Controls */}
+          <ToggleButtonGroup size="small">
+            <ToggleButton
+              value="indent"
+              size="small"
+              onClick={() => editor.chain().focus().sinkListItem('listItem').run()}
+              disabled={!editor.can().sinkListItem('listItem')}
+            >
+              <Tooltip title="Increase Indent">
+                <FormatIndentIncrease fontSize="small" />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton
+              value="outdent"
+              size="small"
+              onClick={() => editor.chain().focus().liftListItem('listItem').run()}
+              disabled={!editor.can().liftListItem('listItem')}
+            >
+              <Tooltip title="Decrease Indent">
+                <FormatIndentDecrease fontSize="small" />
+              </Tooltip>
+            </ToggleButton>
+          </ToggleButtonGroup>
 
           {/* Block Elements */}
           <ToggleButtonGroup size="small" value={editor.isActive('blockquote') ? 'blockquote' : ''}>
