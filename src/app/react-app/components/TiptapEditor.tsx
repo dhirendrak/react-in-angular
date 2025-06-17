@@ -32,11 +32,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
+  DialogActions
 } from '@mui/material';
 import {
   FormatBold,
@@ -562,30 +558,22 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
         <DialogTitle>Insert Table</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ minWidth: 300, pt: 1 }}>
-            <FormControl fullWidth>
-              <InputLabel>Number of Rows</InputLabel>
-              <Select
-                value={tableRows}
-                label="Number of Rows"
-                onChange={(e) => setTableRows(Number(e.target.value))}
-              >
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-                  <MenuItem key={num} value={num}>{num}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl fullWidth>
-              <InputLabel>Number of Columns</InputLabel>
-              <Select
-                value={tableCols}
-                label="Number of Columns"
-                onChange={(e) => setTableCols(Number(e.target.value))}
-              >
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-                  <MenuItem key={num} value={num}>{num}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <TextField
+              fullWidth
+              type="number"
+              label="Number of Rows"
+              value={tableRows}
+              onChange={(e) => setTableRows(Math.max(1, Number(e.target.value)))}
+              slotProps={{ input: { min: 1 } }}
+            />
+            <TextField
+              fullWidth
+              type="number"
+              label="Number of Columns"
+              value={tableCols}
+              onChange={(e) => setTableCols(Math.max(1, Number(e.target.value)))}
+              slotProps={{ input: { min: 1 } }}
+            />
           </Stack>
         </DialogContent>
         <DialogActions>
