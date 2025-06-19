@@ -65,7 +65,7 @@ import {
   FormatIndentDecrease
 } from '@mui/icons-material';
 
-const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label, required, description, errors, visible }) => {
+const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label, required, description, errors, visible, enabled=true }) => {
   const [isHtmlView, setIsHtmlView] = useState(false);
   const [htmlContent, setHtmlContent] = useState(data || '');
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -212,7 +212,9 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           padding: '8px',
           border: '1px solid #e0e0e0',
           borderRadius: '4px',
-          backgroundColor: '#fafafa'
+          backgroundColor: '#fafafa',
+          opacity: enabled ? 1 : 0.5,
+          pointerEvents: enabled ? 'auto' : 'none'
         }}
         divider={<Divider orientation="vertical" flexItem />}
       >
@@ -616,6 +618,7 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           value={htmlContent}
           onChange={handleHtmlChange}
           minRows={isFullscreen ? 20 : 4}
+          disabled={!enabled}
           style={{
             border: '1px solid #ccc',
             borderRadius: '4px',
@@ -633,7 +636,9 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           border: '1px solid #ccc', 
           borderRadius: '4px', 
           padding: '8px', 
-          minHeight: isFullscreen ? 'calc(100vh - 200px)' : 80 
+          minHeight: isFullscreen ? 'calc(100vh - 200px)' : 80,
+          opacity: enabled ? 1 : 0.7,
+          pointerEvents: enabled ? 'auto' : 'none'
         }}>
           <EditorContent editor={editor} />
         </div>

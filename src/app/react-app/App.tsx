@@ -111,6 +111,7 @@ export const App: React.FC<AppProps> = () => {
             renderers={customRenderers}
             cells={materialCells}
             onChange={({ data }) => setData(data)}
+            readonly={false}
           />
           <Button 
             variant="contained" 
