@@ -19,6 +19,7 @@ import Table from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
+import Image from '@tiptap/extension-image';
 import { ControlProps } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import {
@@ -62,16 +63,20 @@ import {
   Subscript as SubscriptIcon,
   TableChart,
   FormatIndentIncrease,
-  FormatIndentDecrease
+  FormatIndentDecrease,
+  Image as ImageIcon
 } from '@mui/icons-material';
 
-const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label, required, description, errors, visible, enabled=true }) => {
+const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label, required, description, errors, visible, enabled = true }) => {
   const [isHtmlView, setIsHtmlView] = useState(false);
   const [htmlContent, setHtmlContent] = useState(data || '');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [tableDialogOpen, setTableDialogOpen] = useState(false);
   const [tableRows, setTableRows] = useState(3);
   const [tableCols, setTableCols] = useState(3);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [imagePath, setImagePath] = useState('');
+  const [imageWidth, setImageWidth] = useState(300);
 
   const editor = useEditor({
     extensions: [
@@ -91,7 +96,7 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
       HorizontalRule,
       TextAlign.configure({
         types: ['heading', 'paragraph'],
-        alignments: ['left', 'center', 'right', 'justify']
+        alignments: ['left', 'center', 'right', 'justify'],
       }),
       Superscript,
       Subscript,
@@ -101,6 +106,12 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
       TableRow,
       TableHeader,
       TableCell,
+      Image.configure({
+        inline: true,
+        HTMLAttributes: {
+          class: 'editor-image',
+        },
+      }),
     ],
     content: data || '',
     onUpdate: ({ editor }) => {
@@ -150,6 +161,31 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
     setTableDialogOpen(false);
   };
 
+  const handleImageDialogOpen = () => {
+    setImageDialogOpen(true);
+  };
+
+  const handleImageDialogClose = () => {
+    setImageDialogOpen(false);
+    setImagePath('');
+    setImageWidth(300);
+  };
+
+  const handleInsertImage = () => {
+    if (imagePath.trim()) {
+      editor.commands.insertContent({
+        type: 'image',
+        attrs: {
+          src: imagePath.trim(),
+          width: imageWidth
+        }
+      });
+      setImageDialogOpen(false);
+      setImagePath('');
+      setImageWidth(300);
+    }
+  };
+
   // Cut, Copy, Paste handlers - Only for formatted view
   const handleCut = () => {
     // Only works in formatted view since button is disabled in HTML view
@@ -186,8 +222,8 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
   };
 
   return (
-    <div style={{ 
-      marginBottom: '16px', 
+    <div style={{
+      marginBottom: '16px',
       display: visible === false ? 'none' : undefined,
       position: isFullscreen ? 'fixed' : 'relative',
       top: isFullscreen ? 0 : 'auto',
@@ -410,12 +446,12 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           </ToggleButtonGroup>
 
           {/* Text Alignment */}
-          <ToggleButtonGroup 
-            size="small" 
-            value={editor.isActive({ textAlign: 'left' }) ? 'left' : 
-                   editor.isActive({ textAlign: 'center' }) ? 'center' : 
-                   editor.isActive({ textAlign: 'right' }) ? 'right' : 
-                   editor.isActive({ textAlign: 'justify' }) ? 'justify' : 'left'}
+          <ToggleButtonGroup
+            size="small"
+            value={editor.isActive({ textAlign: 'left' }) ? 'left' :
+              editor.isActive({ textAlign: 'center' }) ? 'center' :
+                editor.isActive({ textAlign: 'right' }) ? 'right' :
+                  editor.isActive({ textAlign: 'justify' }) ? 'justify' : 'left'}
             exclusive
           >
             <ToggleButton
@@ -577,6 +613,18 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
               <TableChart fontSize="small" />
             </Tooltip>
           </ToggleButton>
+
+          {/* Image */}
+          <ToggleButton
+            size="small"
+            value="image"
+            onClick={handleImageDialogOpen}
+            selected={false}
+          >
+            <Tooltip title="Insert Image">
+              <ImageIcon fontSize="small" />
+            </Tooltip>
+          </ToggleButton>
         </div>
       </Stack>
 
@@ -609,6 +657,42 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
         </DialogActions>
       </Dialog>
 
+      {/* Image Dialog */}
+      <Dialog open={imageDialogOpen} onClose={handleImageDialogClose}>
+        <DialogTitle>Insert Image</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ minWidth: 300, pt: 1 }}>
+            <TextField
+              fullWidth
+              label="Image URL"
+              placeholder="https://example.com/image.jpg"
+              value={imagePath}
+              onChange={(e) => setImagePath(e.target.value)}
+              helperText="Enter the full URL of the image"
+            />
+            <TextField
+              fullWidth
+              label="Image Width (pixels)"
+              type="number"
+              value={imageWidth}
+              onChange={(e) => setImageWidth(Math.max(100, Number(e.target.value)))}
+              slotProps={{ input: { min: 100 } }}
+              helperText="Minimum width: 100px"
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleImageDialogClose}>Cancel</Button>
+          <Button
+            onClick={handleInsertImage}
+            variant="contained"
+            disabled={!imagePath.trim()}
+          >
+            Insert Image
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Content Area */}
       {isHtmlView ? (
         <TextField
@@ -632,10 +716,10 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           }}
         />
       ) : (
-        <div style={{ 
-          border: '1px solid #ccc', 
-          borderRadius: '4px', 
-          padding: '8px', 
+        <div style={{
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+          padding: '8px',
           minHeight: isFullscreen ? 'calc(100vh - 200px)' : 80,
           opacity: enabled ? 1 : 0.7,
           pointerEvents: enabled ? 'auto' : 'none'

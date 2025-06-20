@@ -2,4 +2,17 @@
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* TiptapEditor Image Styles */
+.editor-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 8px 0;
+}
+
+.editor-image img {
+  max-width: 100%;
+  height: auto;
 } 
