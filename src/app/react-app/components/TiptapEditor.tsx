@@ -171,6 +171,11 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
     setImageWidth(300);
   };
 
+  const handleImagePathChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPath = e.target.value;
+    setImagePath(newPath);
+  };
+
   const handleInsertImage = () => {
     if (imagePath.trim()) {
       editor.commands.insertContent({
@@ -194,9 +199,6 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
       const text = editor.state.doc.textBetween(from, to);
       navigator.clipboard.writeText(text).then(() => {
         editor.chain().focus().deleteSelection().run();
-      }).catch(() => {
-        // Fallback for older browsers
-        editor.chain().focus().deleteSelection().run();
       });
     }
   };
@@ -212,13 +214,8 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
 
   const handlePaste = async () => {
     // Only works in formatted view since button is disabled in HTML view
-    try {
-      const text = await navigator.clipboard.readText();
-      editor.chain().focus().insertContent(text).run();
-    } catch (error) {
-      // Fallback to execCommand for older browsers
-      editor.chain().focus().insertContent('').run();
-    }
+    const text = await navigator.clipboard.readText();
+    editor.chain().focus().insertContent(text).run();
   };
 
   return (
@@ -658,7 +655,7 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
       </Dialog>
 
       {/* Image Dialog */}
-      <Dialog open={imageDialogOpen} onClose={handleImageDialogClose}>
+      <Dialog open={imageDialogOpen} onClose={handleImageDialogClose} maxWidth="md" fullWidth>
         <DialogTitle>Insert Image</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ minWidth: 300, pt: 1 }}>
@@ -667,7 +664,7 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
               label="Image URL"
               placeholder="https://example.com/image.jpg"
               value={imagePath}
-              onChange={(e) => setImagePath(e.target.value)}
+              onChange={handleImagePathChange}
               helperText="Enter the full URL of the image"
             />
             <TextField
@@ -679,12 +676,39 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
               slotProps={{ input: { min: 100 } }}
               helperText="Minimum width: 100px"
             />
+            
+            {/* Image Preview */}
+            {imagePath.trim() && (
+              <div style={{ 
+                border: '1px solid #e0e0e0', 
+                borderRadius: '4px', 
+                padding: '16px',
+                backgroundColor: '#fafafa',
+                textAlign: 'center'
+              }}>
+                <div style={{ marginBottom: '8px', fontWeight: 'bold', color: '#666' }}>
+                  Image Preview:
+                </div>
+                <img
+                  src={imagePath.trim()}
+                  alt="Preview"
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '300px',
+                    width: `${imageWidth}px`,
+                    height: 'auto',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px'
+                  }}
+                />
+              </div>
+            )}
           </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleImageDialogClose}>Cancel</Button>
-          <Button
-            onClick={handleInsertImage}
+          <Button 
+            onClick={handleInsertImage} 
             variant="contained"
             disabled={!imagePath.trim()}
           >
