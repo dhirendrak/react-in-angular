@@ -67,6 +67,26 @@ import {
   Image as ImageIcon
 } from '@mui/icons-material';
 
+const CustomImage = Image.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      width: {
+        default: null,
+        renderHTML: (attributes: Record<string, any>) => {
+          if (!attributes['width']) {
+            return {};
+          }
+          return {
+            width: attributes['width'],
+          };
+        },
+        parseHTML: (element: HTMLElement) => element.getAttribute('width'),
+      },
+    };
+  },
+});
+
 const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label, required, description, errors, visible, enabled = true }) => {
   const [isHtmlView, setIsHtmlView] = useState(false);
   const [htmlContent, setHtmlContent] = useState(data || '');
@@ -106,7 +126,7 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
       TableRow,
       TableHeader,
       TableCell,
-      Image.configure({
+      CustomImage.configure({
         inline: true,
         HTMLAttributes: {
           class: 'editor-image',
