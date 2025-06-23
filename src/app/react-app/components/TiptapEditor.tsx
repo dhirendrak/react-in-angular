@@ -1,71 +1,71 @@
-import React, { useState } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
-import Strike from '@tiptap/extension-strike';
-import Code from '@tiptap/extension-code';
-import CodeBlock from '@tiptap/extension-code-block';
-import Paragraph from '@tiptap/extension-paragraph';
-import Heading from '@tiptap/extension-heading';
-import BulletList from '@tiptap/extension-bullet-list';
-import OrderedList from '@tiptap/extension-ordered-list';
-import ListItem from '@tiptap/extension-list-item';
-import Blockquote from '@tiptap/extension-blockquote';
-import HorizontalRule from '@tiptap/extension-horizontal-rule';
-import TextAlign from '@tiptap/extension-text-align';
-import Superscript from '@tiptap/extension-superscript';
-import Subscript from '@tiptap/extension-subscript';
-import Table from '@tiptap/extension-table';
-import TableRow from '@tiptap/extension-table-row';
-import TableCell from '@tiptap/extension-table-cell';
-import TableHeader from '@tiptap/extension-table-header';
-import Image from '@tiptap/extension-image';
 import { ControlProps } from '@jsonforms/core';
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import {
-  Button,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Divider,
-  Tooltip,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions
-} from '@mui/material';
-import {
-  FormatBold,
-  FormatItalic,
-  FormatUnderlined,
-  StrikethroughS,
-  Code as CodeIcon,
   Code as CodeBlockIcon,
-  FormatQuote,
-  HorizontalRule as HorizontalRuleIcon,
+  Code as CodeIcon,
+  ContentCopy,
+  ContentCut,
+  ContentPaste,
+  FormatAlignCenter,
+  FormatAlignJustify,
+  FormatAlignLeft,
+  FormatAlignRight,
+  FormatBold,
+  FormatClear,
+  FormatIndentDecrease,
+  FormatIndentIncrease,
+  FormatItalic,
   FormatListBulleted,
   FormatListNumbered,
-  Title as TitleIcon,
-  TextFields,
-  Code as HtmlIcon,
-  FormatClear,
-  ContentCut,
-  ContentCopy,
-  ContentPaste,
-  FormatAlignLeft,
-  FormatAlignCenter,
-  FormatAlignRight,
-  FormatAlignJustify,
+  FormatQuote,
+  FormatUnderlined,
   Fullscreen,
   FullscreenExit,
-  Superscript as SuperscriptIcon,
+  Code as HtmlIcon,
+  Image as ImageIcon,
+  StrikethroughS,
   Subscript as SubscriptIcon,
+  Superscript as SuperscriptIcon,
   TableChart,
-  FormatIndentIncrease,
-  FormatIndentDecrease,
-  Image as ImageIcon
+  TextFields,
+  Title as TitleIcon
 } from '@mui/icons-material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Stack,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip
+} from '@mui/material';
+import { mergeAttributes, Node } from '@tiptap/core';
+import Blockquote from '@tiptap/extension-blockquote';
+import BulletList from '@tiptap/extension-bullet-list';
+import Code from '@tiptap/extension-code';
+import CodeBlock from '@tiptap/extension-code-block';
+import Heading from '@tiptap/extension-heading';
+import HorizontalRule from '@tiptap/extension-horizontal-rule';
+import Image from '@tiptap/extension-image';
+import ListItem from '@tiptap/extension-list-item';
+import OrderedList from '@tiptap/extension-ordered-list';
+import Paragraph from '@tiptap/extension-paragraph';
+import Strike from '@tiptap/extension-strike';
+import Subscript from '@tiptap/extension-subscript';
+import Superscript from '@tiptap/extension-superscript';
+import Table from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
+import TextAlign from '@tiptap/extension-text-align';
+import Underline from '@tiptap/extension-underline';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import React, { useState } from 'react';
 
 const CustomImage = Image.extend({
   addAttributes() {
@@ -87,6 +87,40 @@ const CustomImage = Image.extend({
   },
 });
 
+const CUSTOM_HTML_SNIPPET = '<div class="custom-div"></div>';
+
+// Custom Div Node Extension
+const Div = Node.create({
+  name: 'div',
+  group: 'block',
+  content: 'block*',
+  defaultOptions: {
+    HTMLAttributes: {
+    },
+  },
+  addAttributes() {
+    return {
+      ['class']: {
+        default: '',
+        parseHTML: element => element.getAttribute('class') || '',
+        renderHTML: attributes => {
+          return attributes['class'] ? { class: attributes['class'] } : {};
+        },
+      },
+    };
+  },
+  parseHTML() {
+    return [
+      {
+        tag: 'div',
+      },
+    ];
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ['div', mergeAttributes(this.options?.HTMLAttributes, HTMLAttributes), 0];
+  },
+});
+
 const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label, required, description, errors, visible, enabled = true }) => {
   const [isHtmlView, setIsHtmlView] = useState(false);
   const [htmlContent, setHtmlContent] = useState(data || '');
@@ -97,6 +131,7 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [imagePath, setImagePath] = useState('');
   const [imageWidth, setImageWidth] = useState(300);
+  const [customHtmlActive, setCustomHtmlActive] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -132,6 +167,7 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           class: 'editor-image',
         },
       }),
+      Div,
     ],
     content: data || '',
     onUpdate: ({ editor }) => {
@@ -236,6 +272,21 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
     // Only works in formatted view since button is disabled in HTML view
     const text = await navigator.clipboard.readText();
     editor.chain().focus().insertContent(text).run();
+  };
+
+  const handleCustomHtmlToggle = () => {
+    const currentHtml = editor.getHTML();
+    if (!customHtmlActive) {
+      // Insert custom HTML at the beginning
+      editor.commands.setContent(CUSTOM_HTML_SNIPPET + currentHtml);
+      setCustomHtmlActive(true);
+    } else {
+      // Remove custom HTML from the beginning if present
+      const regex = new RegExp(`^${CUSTOM_HTML_SNIPPET.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`);
+      const newHtml = currentHtml.replace(regex, '');
+      editor.commands.setContent(newHtml);
+      setCustomHtmlActive(false);
+    }
   };
 
   return (
@@ -642,6 +693,18 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
               <ImageIcon fontSize="small" />
             </Tooltip>
           </ToggleButton>
+
+          {/* Custom HTML */}
+          <ToggleButton
+            size="small"
+            value="customHtml"
+            onClick={handleCustomHtmlToggle}
+            selected={customHtmlActive}
+          >
+            <Tooltip title={customHtmlActive ? "Remove Custom HTML" : "Insert Custom HTML"}>
+              <HtmlIcon fontSize="small" />
+            </Tooltip>
+          </ToggleButton>
         </div>
       </Stack>
 
@@ -696,12 +759,11 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
               slotProps={{ input: { min: 100 } }}
               helperText="Minimum width: 100px"
             />
-            
             {/* Image Preview */}
             {imagePath.trim() && (
-              <div style={{ 
-                border: '1px solid #e0e0e0', 
-                borderRadius: '4px', 
+              <div style={{
+                border: '1px solid #e0e0e0',
+                borderRadius: '4px',
                 padding: '16px',
                 backgroundColor: '#fafafa',
                 textAlign: 'center'
@@ -727,8 +789,8 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
         </DialogContent>
         <DialogActions>
           <Button onClick={handleImageDialogClose}>Cancel</Button>
-          <Button 
-            onClick={handleInsertImage} 
+          <Button
+            onClick={handleInsertImage}
             variant="contained"
             disabled={!imagePath.trim()}
           >
@@ -736,7 +798,6 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           </Button>
         </DialogActions>
       </Dialog>
-
       {/* Content Area */}
       {isHtmlView ? (
         <TextField
