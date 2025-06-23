@@ -28,7 +28,8 @@ import {
   Superscript as SuperscriptIcon,
   TableChart,
   TextFields,
-  Title as TitleIcon
+  Title as TitleIcon,
+  Comment as CalloutIcon
 } from '@mui/icons-material';
 import {
   Button,
@@ -287,6 +288,15 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
       editor.commands.setContent(newHtml);
       setCustomHtmlActive(false);
     }
+  };
+
+  const handleCallout = () => {
+    const calloutHtml = '<div class="richtext_callout"><div>Callout Heading</div>Callout content goes here</div>';
+    editor.chain()
+      .focus()
+      .deleteSelection()
+      .insertContent(calloutHtml)
+      .run();
   };
 
   return (
@@ -691,6 +701,18 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
           >
             <Tooltip title="Insert Image">
               <ImageIcon fontSize="small" />
+            </Tooltip>
+          </ToggleButton>
+
+          {/* Callout */}
+          <ToggleButton
+            size="small"
+            value="callout"
+            onClick={handleCallout}
+            selected={false}
+          >
+            <Tooltip title="Add Callout">
+              <CalloutIcon fontSize="small" />
             </Tooltip>
           </ToggleButton>
 
