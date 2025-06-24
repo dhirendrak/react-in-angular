@@ -29,15 +29,23 @@ import {
   TableChart,
   TextFields,
   Title as TitleIcon,
-  Comment as CalloutIcon
+  Comment as CalloutIcon,
+  ArrowDropDown as ArrowDropDownIcon
 } from '@mui/icons-material';
 import {
   Button,
+  ButtonGroup,
+  ClickAwayListener,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   Divider,
+  Grow,
+  MenuItem,
+  MenuList,
+  Paper,
+  Popper,
   Stack,
   TextField,
   ToggleButton,
@@ -66,7 +74,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 const CustomImage = Image.extend({
   addAttributes() {
@@ -133,6 +141,8 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
   const [imagePath, setImagePath] = useState('');
   const [imageWidth, setImageWidth] = useState(300);
   const [customHtmlActive, setCustomHtmlActive] = useState(false);
+  const [headingMenuOpen, setHeadingMenuOpen] = useState(false);
+  const headingMenuAnchorRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
     extensions: [
@@ -181,8 +191,6 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
   if (!editor) {
     return null;
   }
-
-  const headingLevels = [1, 2, 3, 4, 5, 6];
 
   const handleViewToggle = () => {
     if (isHtmlView) {
@@ -299,6 +307,39 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
       .run();
   };
 
+  const handleHeadingMenuToggle = () => {
+    setHeadingMenuOpen((prevOpen) => !prevOpen);
+  };
+
+  const handleHeadingMenuClose = (event: Event) => {
+    if (headingMenuAnchorRef.current && headingMenuAnchorRef.current.contains(event.target as HTMLElement)) {
+      return;
+    }
+    setHeadingMenuOpen(false);
+  };
+
+  const handleHeadingMenuItemClick = (event: React.MouseEvent, value: 'paragraph' | 1 | 2 | 3 | 4 | 5 | 6) => {
+    if (value === 'paragraph') {
+      editor.chain().focus().setParagraph().run();
+    } else {
+      editor.chain().focus().toggleHeading({ level: value }).run();
+    }
+    setHeadingMenuOpen(false);
+  };
+
+  const headingOptions = [
+    { value: 'paragraph', label: 'Paragraph' },
+    { value: 1, label: 'Heading 1' },
+    { value: 2, label: 'Heading 2' },
+    { value: 3, label: 'Heading 3' },
+    { value: 4, label: 'Heading 4' },
+    { value: 5, label: 'Heading 5' },
+    { value: 6, label: 'Heading 6' },
+  ] as const;
+
+  const currentHeadingValue = editor.isActive('heading') ? (editor.getAttributes('heading') as any).level : 'paragraph';
+  const currentHeadingOption = headingOptions.find(opt => opt.value === currentHeadingValue) || headingOptions[0];
+
   return (
     <div style={{
       marginBottom: '16px',
@@ -393,55 +434,52 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
         {/* Formatting Tools - Disabled when in HTML view */}
         <div style={{ opacity: isHtmlView ? 0.5 : 1, pointerEvents: isHtmlView ? 'none' : 'auto' }}>
           {/* Text Style */}
-          <ToggleButtonGroup
-            size="small"
-            value={editor.isActive('heading') ? (editor.getAttributes('heading') as any).level : 'paragraph'}
-            exclusive
-            onChange={(event, value) => {
-              if (value === 'paragraph') {
-                editor.chain().focus().setParagraph().run();
-              } else if (value && headingLevels.includes(value)) {
-                editor.chain().focus().toggleHeading({ level: value }).run();
-              }
-            }}
+          <ButtonGroup variant="outlined" ref={headingMenuAnchorRef} size="small" aria-label="split button">
+            <Button onClick={handleHeadingMenuToggle} style={{ textTransform: 'none' }}>{currentHeadingOption.label}</Button>
+            <Button
+              size="small"
+              aria-controls={headingMenuOpen ? 'split-button-menu' : undefined}
+              aria-expanded={headingMenuOpen ? 'true' : undefined}
+              aria-label="select heading style"
+              aria-haspopup="menu"
+              onClick={handleHeadingMenuToggle}
+            >
+              <ArrowDropDownIcon />
+            </Button>
+          </ButtonGroup>
+          <Popper
+            open={headingMenuOpen}
+            anchorEl={headingMenuAnchorRef.current}
+            role={undefined}
+            transition
+            disablePortal
+            style={{ zIndex: 10000 }}
           >
-            <ToggleButton value="paragraph" size="small">
-              <Tooltip title="Paragraph">
-                <TextFields fontSize="small" />
-              </Tooltip>
-            </ToggleButton>
-            <ToggleButton value={1} size="small">
-              <Tooltip title="Heading 1">
-                <TitleIcon fontSize="small" />
-              </Tooltip>
-            </ToggleButton>
-            <ToggleButton value={2} size="small">
-              <Tooltip title="Heading 2">
-                <TitleIcon fontSize="small" />
-              </Tooltip>
-            </ToggleButton>
-            <ToggleButton value={3} size="small">
-              <Tooltip title="Heading 3">
-                <TitleIcon fontSize="small" />
-              </Tooltip>
-            </ToggleButton>
-            <ToggleButton value={4} size="small">
-              <Tooltip title="Heading 4">
-                <TitleIcon fontSize="small" />
-              </Tooltip>
-            </ToggleButton>
-            <ToggleButton value={5} size="small">
-              <Tooltip title="Heading 5">
-                <TitleIcon fontSize="small" />
-              </Tooltip>
-            </ToggleButton>
-            <ToggleButton value={6} size="small">
-              <Tooltip title="Heading 6">
-                <TitleIcon fontSize="small" />
-              </Tooltip>
-            </ToggleButton>
-          </ToggleButtonGroup>
-
+            {({ TransitionProps, placement }) => (
+              <Grow
+                {...TransitionProps}
+                style={{
+                  transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom',
+                }}
+              >
+                <Paper>
+                  <ClickAwayListener onClickAway={handleHeadingMenuClose}>
+                    <MenuList id="split-button-menu" autoFocusItem>
+                      {headingOptions.map((option) => (
+                        <MenuItem
+                          key={option.value}
+                          selected={option.value === currentHeadingValue}
+                          onClick={(event) => handleHeadingMenuItemClick(event, option.value)}
+                        >
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </MenuList>
+                  </ClickAwayListener>
+                </Paper>
+              </Grow>
+            )}
+          </Popper>
 
           {/* Text Formatting */}
           <ToggleButtonGroup size="small" value={editor.isActive('bold') ? 'bold' : ''}>
