@@ -432,21 +432,23 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
         </ToggleButton>
 
         {/* Formatting Tools - Disabled when in HTML view */}
-        <div style={{ opacity: isHtmlView ? 0.5 : 1, pointerEvents: isHtmlView ? 'none' : 'auto' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '2px', opacity: isHtmlView ? 0.5 : 1, pointerEvents: isHtmlView ? 'none' : 'auto' }}>
           {/* Text Style */}
-          <ButtonGroup variant="outlined" ref={headingMenuAnchorRef} size="small" aria-label="split button">
-            <Button onClick={handleHeadingMenuToggle} style={{ textTransform: 'none' }}>{currentHeadingOption.label}</Button>
-            <Button
-              size="small"
-              aria-controls={headingMenuOpen ? 'split-button-menu' : undefined}
-              aria-expanded={headingMenuOpen ? 'true' : undefined}
-              aria-label="select heading style"
-              aria-haspopup="menu"
-              onClick={handleHeadingMenuToggle}
-            >
-              <ArrowDropDownIcon />
-            </Button>
-          </ButtonGroup>
+          <div style={{ border: '1px solid rgba(0, 0, 0, 0.23)', borderRadius: '4px', display: 'inline-flex' }}>
+            <ButtonGroup variant="text" color="inherit" ref={headingMenuAnchorRef} size="small" aria-label="split button">
+              <Button onClick={handleHeadingMenuToggle} style={{ textTransform: 'none' }}>{currentHeadingOption.label}</Button>
+              <Button
+                size="small"
+                aria-controls={headingMenuOpen ? 'split-button-menu' : undefined}
+                aria-expanded={headingMenuOpen ? 'true' : undefined}
+                aria-label="select heading style"
+                aria-haspopup="menu"
+                onClick={handleHeadingMenuToggle}
+              >
+                <ArrowDropDownIcon />
+              </Button>
+            </ButtonGroup>
+          </div>
           <Popper
             open={headingMenuOpen}
             anchorEl={headingMenuAnchorRef.current}
