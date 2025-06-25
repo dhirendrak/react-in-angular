@@ -541,7 +541,12 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
             <ToggleButton
               value="superscript"
               size="small"
-              onClick={() => editor.chain().focus().toggleSuperscript().run()}
+              onClick={() => {
+                if (editor.isActive('subscript')) {
+                  editor.chain().focus().unsetSubscript().run();
+                }
+                editor.chain().focus().toggleSuperscript().run();
+              }}
               selected={editor.isActive('superscript')}
             >
               <Tooltip title="Superscript">
@@ -554,7 +559,12 @@ const TiptapEditor: React.FC<ControlProps> = ({ data, handleChange, path, label,
             <ToggleButton
               value="subscript"
               size="small"
-              onClick={() => editor.chain().focus().toggleSubscript().run()}
+              onClick={() => {
+                if (editor.isActive('superscript')) {
+                  editor.chain().focus().unsetSuperscript().run();
+                }
+                editor.chain().focus().toggleSubscript().run();
+              }}
               selected={editor.isActive('subscript')}
             >
               <Tooltip title="Subscript">
