@@ -15,14 +15,14 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^17.0.0",
-    "@angular/common": "^17.0.0",
-    "@angular/compiler": "^17.0.0",
-    "@angular/core": "^17.0.0",
-    "@angular/forms": "^17.0.0",
-    "@angular/platform-browser": "^17.0.0",
-    "@angular/platform-browser-dynamic": "^17.0.0",
-    "@angular/router": "^17.0.0",
+    "@angular/animations": "^18.2.13",
+    "@angular/common": "^18.2.13",
+    "@angular/compiler": "^18.2.13",
+    "@angular/core": "^18.2.13",
+    "@angular/forms": "^18.2.13",
+    "@angular/platform-browser": "^18.2.13",
+    "@angular/platform-browser-dynamic": "^18.2.13",
+    "@angular/router": "^18.2.13",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@jsonforms/core": "^3.5.1",
@@ -62,9 +62,9 @@
     "zone.js": "~0.14.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^17.0.0",
-    "@angular/cli": "^17.0.0",
-    "@angular/compiler-cli": "^17.0.0",
+    "@angular-devkit/build-angular": "^18.2.20",
+    "@angular/cli": "^18.2.20",
+    "@angular/compiler-cli": "^18.2.13",
     "@testing-library/react": "^14.0.0",
     "@testing-library/jest-dom": "^6.1.0",
     "@testing-library/user-event": "^14.5.0",
@@ -80,6 +80,6 @@
     "karma-coverage": "^2.2.0",
     "karma-jasmine": "^5.1.0",
     "karma-jasmine-html-reporter": "^2.1.0",
-    "typescript": "~5.2.2"
+    "typescript": "~5.5.4"
   }
 }
