@@ -13,7 +13,11 @@ import { htmlStringTester, htmlArrayItemTester } from './utils/schemaTesters';
 import { virtualizedArrayTester } from './utils/virtualizedSchemaTesters';
 import { collapsibleSectionTester } from './utils/collapsibleSectionTesters';
 
-interface AppProps { }
+interface AppProps {
+  focusElementObservable?: {
+    subscribe: (callback: (elementId: string) => void) => { unsubscribe: () => void }
+  }
+}
 
 const customRenderers = [
   ...materialRenderers,
@@ -35,7 +39,7 @@ const customRenderers = [
   }
 ];
 
-export const App: React.FC<AppProps> = () => {
+export const App: React.FC<AppProps> = ({ focusElementObservable }) => {
   const [data, setData] = useState({});
   const [schema, setSchema] = useState<JsonSchema>({});
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
@@ -59,6 +63,31 @@ export const App: React.FC<AppProps> = () => {
         });
       });
   }, []);
+
+  useEffect(() => {
+    // Subscribe to focus events from Angular
+    if (focusElementObservable) {
+      const subscription = focusElementObservable.subscribe((elementId: string) => {
+        // Find the element by ID and focus it
+        const element = document.getElementById(elementId);
+        if (element) {
+          // If it's an input, textarea, or other focusable element
+          if ('focus' in element) {
+            (element as HTMLElement & { focus: Function }).focus();
+          }
+          // Scroll element into view
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+    
+    // Return a no-op cleanup function when focusElementObservable is undefined
+    return () => {};
+  }, [focusElementObservable]);
 
   const handleSave = async () => {
     try {
